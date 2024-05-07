@@ -1,0 +1,151 @@
+Task 1
+
+public interface AccessHandler {
+    boolean handleRequest(String request);
+}
+
+
+public class PermissionHandler implements AccessHandler {
+    @Override
+    public boolean handleRequest(String request) {
+        // Check permissions logic here
+        System.out.println("PermissionHandler: Processing request - " + request);
+        return true; // Return true if request is handled successfully
+    }
+}
+
+
+public class LoggingHandler implements AccessHandler {
+    @Override
+    public boolean handleRequest(String request) {
+       
+        System.out.println("LoggingHandler: Logging request - " + request);
+        return true; // Return true if request is logged successfully
+    }
+}
+
+public interface Command {
+    boolean execute();
+
+    void undo();
+}
+
+
+public class Demo {
+    public static void main(String[] args) {
+        AccessHandler permissionHandler = new PermissionHandler();
+        AccessHandler loggingHandler = new LoggingHandler();
+
+        String request = "User request";
+
+        // Chain the handlers to process the access request
+        if (permissionHandler.handleRequest(request)) {
+            if (loggingHandler.handleRequest(request)) {
+                System.out.println("Access request processed successfully.");
+            } else {
+                System.out.println("Logging failed.");
+            }
+
+}
+
+        } else {
+            System.out.println("Permission denied.");
+        }
+    }
+}
+
+
+Task 2
+public class AuthorizationHandler extends AbstractHandler {
+    @Override
+    public boolean handle(String request) {
+        if ("authorized".equals(request)) {
+            System.out.println("User authorized.");
+            return handleNext(request);
+        } else {
+            System.out.println("Authorization failed.");
+            return false;
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Handler roleCheck = new RoleCheckHandler();
+        Handler auth = new AuthenticationHandler();
+        Handler authorization = new AuthorizationHandler();
+
+        auth.setNext(roleCheck); 
+        roleCheck.setNext(authorization);
+
+        processRequest("valid", auth);
+        processRequest("invalid", auth);
+    }
+
+    private static void processRequest(String request, Handler handler) {
+        System.out.println("Processing: " + request);
+        if (!handler.handle(request)) {
+            System.out.println("Request denied.\n");
+        } else {
+            System.out.println("Request approved.\n");
+        }
+    }
+}
+
+Task 3
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public interface EventListener {
+    void update(String eventType, File file);
+}
+
+public class EventManager {
+    Map<String, List<EventListener>> listeners = new HashMap<>();
+
+    public EventManager(String... operations) {
+        for (String operation : operations) {
+            this.listeners.put(operation, new ArrayList<>());
+        }
+    }
+
+    public void subscribe(String eventType, EventListener listener) {
+        List<EventListener> users = listeners.get(eventType);
+        users.add(listener);
+    }
+
+    public void unsubscribe(String eventType, EventListener listener) {
+        List<EventListener> users = listeners.get(eventType);
+        users.remove(listener);
+    }
+
+    public void notify(String eventType, File file) {
+        List<EventListener> users = listeners.get(eventType);
+        for (EventListener listener : users) {
+            listener.update(eventType, file);
+        }
+    }
+}
+public class Editor {
+    public EventManager events;
+    private File file;
+
+    public Editor() {
+        this.events = new EventManager("open", "save");
+    }
+
+    public void openFile(String filePath) {
+        this.file = new File(filePath);
+        events.notify("open", file);
+    }
+
+    public void saveFile() throws Exception {
+        
+        events.notify("save", file);
+    }
+}
+
