@@ -1,0 +1,231 @@
+Task 1
+
+interface Expression {
+    int interpret();
+}
+
+
+class NumberExpression implements Expression {
+    private int number;
+
+    public NumberExpression(int number) {
+        this.number = number;
+    }
+
+    @Override
+    public int interpret() {
+        return number;
+    }
+}
+
+
+class AdditionExpression implements Expression {
+    private Expression left;
+    private Expression right;
+
+    public AdditionExpression(Expression left, Expression right) {
+        this.left = left;
+        this.right = right;
+    }
+
+    @Override
+    public int interpret() {
+        return left.interpret() + right.interpret();
+    }
+}
+
+
+class SubtractionExpression implements Expression {
+    private Expression left;
+    private Expression right;
+
+    public SubtractionExpression(Expression left, Expression right) {
+        this.left = left;
+        this.right = right;
+    }
+
+    @Override
+    public int interpret() {
+        return left.interpret() - right.interpret();
+    }
+}
+
+
+class MultiplicationExpression implements Expression {
+    private Expression left;
+    private Expression right;
+
+    public MultiplicationExpression(Expression left, Expression right) {
+        this.left = left;
+        this.right = right;
+    }
+
+    @Override
+    public int interpret() {
+        return left.interpret() * right.interpret();
+    }
+}
+
+
+class ExpressionInterpreter {
+    public static int evaluate(Expression expression) {
+        return expression.interpret();
+    }
+}
+
+
+public class Main {
+    public static void main(String[] args) {
+        // Build the expression: 5 * (7 + 3) - 2
+        Expression expression = new SubtractionExpression(
+            new MultiplicationExpression(
+                new NumberExpression(5),
+                new AdditionExpression(new NumberExpression(7), new NumberExpression(3))
+            ),
+            new NumberExpression(2)
+        );
+
+        // Evaluate the expression using the interpreter
+        int result = ExpressionInterpreter.evaluate(expression);
+        System.out.println("Result: " + result); // Output: Result: 45
+    }
+}
+
+
+Task 2
+
+import java.util.*;
+
+
+class Node {
+    int val;
+    List<Node> neighbors;
+
+    public Node(int val) {
+        this.val = val;
+        this.neighbors = new ArrayList<>();
+    }
+}
+
+// DFS iterator for the directed tree
+class DFSTreeIterator implements Iterator<Node> {
+    private Stack<Node> stack;
+
+    public DFSTreeIterator(Node root) {
+        stack = new Stack<>();
+        stack.push(root);
+    }
+
+    @Override
+    public boolean hasNext() {
+        return !stack.isEmpty();
+    }
+
+    @Override
+    public Node next() {
+        if (!hasNext()) {
+            throw new NoSuchElementException();
+        }
+
+        Node current = stack.pop();
+        List<Node> neighbors = current.neighbors;
+        for (int i = neighbors.size() - 1; i >= 0; i--) {
+            stack.push(neighbors.get(i));
+        }
+
+        return current;
+    }
+}
+
+public class DirectedTree {
+    public static void main(String[] args) {
+        
+        Node root = new Node(1);
+        Node node2 = new Node(2);
+        Node node3 = new Node(3);
+        Node node4 = new Node(4);
+
+        root.neighbors.add(node2);
+        root.neighbors.add(node3);
+        node2.neighbors.add(node4);
+
+       
+        DFSTreeIterator iterator = new DFSTreeIterator(root);
+
+   
+        System.out.println("DFS Traversal:");
+        while (iterator.hasNext()) {
+            Node node = iterator.next();
+            System.out.print(node.val + " ");
+        }
+    }
+}
+
+Task 3
+
+interface Visitor {
+    void visit(Book book);
+    void visit(Tea tea);
+    void visit(Coffee coffee);
+}
+
+interface Visitable {
+    void accept(Visitor visitor);
+}
+
+class Book implements Visitable {
+    @Override
+    public void accept(Visitor visitor) {
+        visitor.visit(this);
+    }
+}
+
+class Tea implements Visitable {
+    @Override
+    public void accept(Visitor visitor) {
+        visitor.visit(this);
+    }
+}
+
+class Coffee implements Visitable {
+    @Override
+    public void accept(Visitor visitor) {
+        visitor.visit(this);
+    }
+}
+
+class DiscountVisitor implements Visitor {
+    private double discount = 0.1; // 10% discount for book readers
+
+    @Override
+    public void visit(Book book) {
+        System.out.println("No discount for books.");
+    }
+
+    @Override
+    public void visit(Tea tea) {
+        System.out.println("10% discount applied to tea for book readers.");
+    }
+
+    @Override
+    public void visit(Coffee coffee) {
+        System.out.println("10% discount applied to coffee for book readers.");
+    }
+}
+
+
+public class OnlineStore {
+    public static void main(String[] args) {
+        Book book = new Book();
+        Tea tea = new Tea();
+        Coffee coffee = new Coffee();
+
+      
+        Visitor discountVisitor = new DiscountVisitor();
+
+        book.accept(discountVisitor);
+        tea.accept(discountVisitor);
+        coffee.accept(discountVisitor);
+    }
+}
+
