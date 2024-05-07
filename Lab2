@@ -1,0 +1,83 @@
+Task 1
+
+#include <iostream>
+
+using namespace std;
+
+class Box {
+private:
+    unsigned int length, width, height;
+
+public:
+    
+    Box() : length(0), width(0), height(0) {}
+
+   
+    Box(const Box& other) : length(other.length), width(other.width), height(other.height) {}
+
+    
+    Box(unsigned int side) : length(side), width(side), height(side) {}
+
+    
+    Box& operator=(const Box& other) {
+        if (this != &other) {
+            length = other.length;
+            width = other.width;
+            height = other.height;
+        }
+        return *this;
+    }
+
+   
+    void display() {
+        cout << "Length: " << length << ", Width: " << width << ", Height: " << height << endl;
+    }
+     Box operator*(unsigned int scaleValue) const {
+        return Box(length * scaleValue, width * scaleValue, height * scaleValue);
+    }
+    void scale(unsigned int scaleValue) {
+        length *= scaleValue;
+        width *= scaleValue;
+        height *= scaleValue;
+    }
+    bool isBigger(const Box& other) {
+        return getVolume() > other.getVolume();
+    }
+
+    
+    bool operator==(const Box& other) const {
+        array<unsigned int, 3> this_dims = {length, width, height};
+        array<unsigned int, 3> other_dims = {other.length, other.width, other.height};
+        sort(this_dims.begin(), this_dims.end());
+        sort(other_dims.begin(), other_dims.end());
+        return this_dims == other_dims;
+    }
+    bool isSmaller(const Box& other) {
+        return getVolume() < other.getVolume();
+    }
+};
+
+int main() {
+    
+    Box box1;
+    box1.display(); 
+    Box box2(5);
+    box2.display(); 
+
+    Box box3(box2);
+    box3.display(); 
+
+    Box box4;
+    box4 = box2;
+    box4.display(); 
+    if (box1.isBigger(box2)) {
+        cout << "Box1 is bigger than Box2" << endl;
+    } else {
+        cout << "Box1 is not bigger than Box2" << endl;
+    }
+
+    return 0;
+}
+
+Task 2
+
