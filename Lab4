@@ -1,1 +1,139 @@
 Task 1
+
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+class Account {
+private:
+    int accountNumber;
+    double balance;
+    string ownerName;
+
+public:
+    // Defaulted default constructor
+    Account() = default; 
+
+    // Constructor with initial values
+    Account(int accNum, double initialBalance, const string& name)
+        : accountNumber(accNum), balance(initialBalance), ownerName(name) {}
+
+    // Deleted copy constructor and assignment operator 
+    Account(const Account&) = delete;            
+    Account& operator=(const Account&) = delete; 
+
+    void deposit(double amount) {
+        if (amount > 0) {
+            balance += amount;
+        } else {
+            cout << "Invalid deposit amount." << endl;
+        }
+    }
+
+    void withdraw(double amount) {
+        if (amount > 0 && balance >= amount) {
+            balance -= amount;
+        } else {
+            cout << "Invalid withdrawal amount or insufficient funds." << endl;
+        }
+    }
+
+    double getBalance() const { return balance; }
+    int getAccountNumber() const { return accountNumber; }
+    string getOwnerName() const { return ownerName; }
+};
+
+class SavingsAccount : public Account {
+private:
+    double interestRate;
+
+public:
+    SavingsAccount(int accNum, double initialBalance, const string& name, double rate)
+        : Account(accNum, initialBalance, name), interestRate(rate) {}
+
+    void calculateInterest() {
+        double interest = getBalance() * (interestRate / 100);
+        deposit(interest); // Use the deposit function to add interest
+    }
+
+    double getInterestRate() const { return interestRate; }
+};
+
+int main() {
+    // Usage example
+    SavingsAccount savings(123456, 1000.0, "John Doe", 2.5);
+    savings.deposit(500.0);
+    savings.withdraw(200.0);
+    savings.calculateInterest();
+
+    cout << "Account Number: " << savings.getAccountNumber() << endl;
+    cout << "Owner's Name: " << savings.getOwnerName() << endl;
+    cout << "Current Balance: " << savings.getBalance() << endl;
+    cout << "Interest Rate: " << savings.getInterestRate() << "%" << endl;
+
+    return 0;
+}
+
+Task 2
+
+#include <iostream>
+#include <cmath>
+
+using namespace std;
+
+class Shape {
+public:
+    virtual double area() const = 0;  
+    virtual double perimeter() const = 0; 
+};
+
+class Rectangle : public Shape {
+private:
+    double width, height;
+
+public:
+    Rectangle(double w, double h) : width(w), height(h) {}
+
+    double area() const override { return width * height; }
+    double perimeter() const override { return 2 * (width + height); }
+};
+
+class Circle : public Shape {
+private:
+    double radius;
+
+public:
+    Circle(double r) : radius(r) {}
+
+    double area() const override { return M_PI * radius * radius; }
+    double perimeter() const override { return 2 * M_PI * radius; }
+};
+
+int main() {
+    Rectangle rectangle(5.0, 3.0);
+    Circle circle(4.0);
+
+    Shape* shape = &rectangle;
+
+
+    const Rectangle* rectPtr = static_cast<const Rectangle*>(shape); 
+
+    Circle* circlePtr = dynamic_cast<Circle*>(shape);
+    if (circlePtr) {
+        cout << "shape is a Circle" << endl;
+    } else {
+        cout << "shape is not a Circle" << endl;
+    }
+
+
+    Rectangle* nonConstRectPtr = const_cast<Rectangle*>(rectPtr); 
+    // ... (modify nonConstRectPtr if needed, but be careful!)
+
+    int intValue = 42;
+    
+    double* doublePtr = reinterpret_cast<double*>(&intValue);
+    cout << "intValue reinterpreted as double: " << *doublePtr << endl;
+
+    return 0;
+}
