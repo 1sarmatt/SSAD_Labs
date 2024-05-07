@@ -1,0 +1,187 @@
+Task 1
+
+#include <iostream>
+#include <string>
+#include <memory>
+
+using namespace std;
+
+// Enemy Class (with name and health)
+class Enemy {
+private:
+    string name;
+    int health;
+
+public:
+    Enemy(const string& name, int health) : name(name), health(health) {}
+
+    void takeDamage(int damage) {
+        health -= damage;
+        cout << name << " takes " << damage << " damage. Health remaining: " << health << endl;
+    }
+
+    string getName() const { return name; }
+    int getHealth() const { return health; }
+};
+
+// Attack Strategy Interface
+class AttackStrategy {
+public:
+    virtual void attack(Enemy& enemy) = 0;
+};
+
+// Concrete Attack Strategies
+class MageAttack : public AttackStrategy {
+public:
+    void attack(Enemy& enemy) override {
+        int damage = 10; // Base mage damage
+        enemy.takeDamage(damage); 
+        cout << "Mage casts a spell!" << endl;
+    }
+};
+
+class RogueAttack : public AttackStrategy {
+public:
+    void attack(Enemy& enemy) override {
+        int damage = 15; // Base rogue damage
+        // Rogues might have a chance for critical hits, for example:
+        if (rand() % 100 < 20) { // 20% chance for critical hit
+            damage *= 2;
+            cout << "Critical hit! ";
+        }
+        enemy.takeDamage(damage);
+        cout << "Rogue strikes with a dagger!" << endl;
+    }
+};
+
+class WarriorAttack : public AttackStrategy {
+public:
+    void attack(Enemy& enemy) override {
+        int damage = 25; // Base warrior damage
+        enemy.takeDamage(damage);
+        cout << "Warrior swings a mighty sword!" << endl;
+    }
+};
+
+// Character Class (with name and attack strategy)
+class Character {
+private:
+    string name;
+    unique_ptr<AttackStrategy> attackStrategy; 
+
+public:
+    Character(const string& name, unique_ptr<AttackStrategy> strategy) 
+        : name(name), attackStrategy(move(strategy)) {}
+
+    void attack(Enemy& enemy) {
+        cout << name << ": ";
+        attackStrategy->attack(enemy);
+    }
+};
+
+int main() {
+    // Create characters with different attack strategies
+    Character warrior("Aragorn", make_unique<WarriorAttack>());
+    Character mage("Gandalf", make_unique<MageAttack>());
+    Character rogue("Legolas", make_unique<RogueAttack>());
+
+    // Create enemies
+    Enemy goblin("Goblin", 50);
+    Enemy troll("Troll", 150);
+
+    // Attack sequence
+    warrior.attack(goblin);
+    mage.attack(troll); 
+    rogue.attack(goblin); 
+
+    return 0;
+}
+
+Task 2
+
+#include <unordered_map>
+#include <string>
+#include <iostream>
+#include <memory> 
+
+using namespace std;
+
+
+class PaymentProviderInterface {
+public:
+    virtual void processPayment(const string& item) = 0;
+    virtual bool verifyPayment(const string& transactionId) = 0;
+    virtual void refundPayment(const string& item) = 0;
+};
+
+
+class PayPalAdapter : public PaymentProviderInterface {
+private:
+    PayPal paypal;
+
+public:
+    void processPayment(const string& item) override {
+        paypal.makePayment(item);
+    }
+
+    bool verifyPayment(const string& transactionId) override {
+        return paypal.verifyPayment(transactionId);
+    }
+
+    void refundPayment(const string& item) override {
+        paypal.refundPayment(item);
+    }
+};
+
+class StripeAdapter : public PaymentProviderInterface {
+private:
+    Stripe stripe;
+
+public:
+    void processPayment(const string& item) override {
+        stripe.chargePayment(item);
+    }
+
+    bool verifyPayment(const string& transactionId) override {
+        return stripe.verifyCharge(transactionId);
+    }
+
+    void refundPayment(const string& item) override {
+        stripe.issueRefund(item);
+    }
+};
+
+
+class PaymentGateway {
+private:
+    unordered_map<string, unique_ptr<PaymentProviderInterface>> providers;
+
+public:
+    void addProvider(const string& name, unique_ptr<PaymentProviderInterface> provider) {
+        providers[name] = move(provider); 
+    }
+
+    void processPayment(const string& providerName, const string& item) {
+        if (providers.count(providerName) == 0) {
+            cerr << "Error: Unknown payment provider: " << providerName << endl;
+            return;
+        }
+        providers[providerName]->processPayment(item);
+    }
+
+   
+};
+
+int main() {
+    PaymentGateway gateway;
+
+
+    gateway.addProvider("PayPal", make_unique<PayPalAdapter>());
+    gateway.addProvider("Stripe", make_unique<StripeAdapter>());
+
+    gateway.processPayment("PayPal", "Laptop");
+    gateway.processPayment("Stripe", "Subscription");
+
+    return 0;
+}
+
