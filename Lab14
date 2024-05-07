@@ -1,0 +1,138 @@
+Task 1
+public abstract class Recipe {
+    public void makeRecipe() {
+        listIngredients();
+        prepareRecipe();
+        serveDish();
+    }
+
+    protected abstract void listIngredients();
+
+    protected abstract void prepareRecipe();
+
+    protected void serveDish() {
+        System.out.println("Serve the dish.");
+    }
+}
+public class CakeRecipe extends Recipe {
+    @Override
+    protected void listIngredients() {
+        System.out.println("Ingredients for Cake: Flour, Sugar, Eggs, Butter, Baking Powder");
+    }
+
+    @Override
+    protected void prepareRecipe() {
+        System.out.println("Steps to make Cake: Mix ingredients, Bake in oven, Decorate");
+    }
+}
+public class SaladRecipe extends Recipe {
+    @Override
+    protected void listIngredients() {
+        System.out.println("Ingredients for Salad: Lettuce, Tomatoes, Cucumbers, Dressing");
+    }
+
+    @Override
+    protected void prepareRecipe() {
+        System.out.println("Steps to make Salad: Chop vegetables, Mix with dressing, Toss gently");
+    }
+}
+public class CookingApp {
+    public static void main(String[] args) {
+        Recipe cakeRecipe = new CakeRecipe();
+        Recipe saladRecipe = new SaladRecipe();
+
+        System.out.println("Making Cake:");
+        cakeRecipe.makeRecipe();
+
+        System.out.println("\nMaking Salad:");
+        saladRecipe.makeRecipe();
+    }
+}
+
+
+Task 2
+
+public interface Mediator {
+    void notify(Device sender, String event);
+}
+public abstract class Device {
+    protected Mediator mediator;
+
+    public Device(Mediator mediator) {
+        this.mediator = mediator;
+    }
+
+    public abstract void sendEvent(String event);
+
+    public abstract void receiveEvent(String event);
+}
+public class DoorLock extends Device {
+    public DoorLock(Mediator mediator) {
+        super(mediator);
+    }
+
+    @Override
+    public void sendEvent(String event) {
+        System.out.println("Door Lock sends event: " + event);
+        mediator.notify(this, event);
+    }
+
+    @Override
+    public void receiveEvent(String event) {
+        System.out.println("Door Lock receives event: " + event);
+    }
+}
+
+public class MotionSensor extends Device {
+    public MotionSensor(Mediator mediator) {
+        super(mediator);
+    }
+
+    @Override
+    public void sendEvent(String event) {
+        System.out.println("Motion Sensor sends event: " + event);
+        mediator.notify(this, event);
+    }
+
+    @Override
+    public void receiveEvent(String event) {
+        System.out.println("Motion Sensor receives event: " + event);
+    }
+}
+
+public class Light extends Device {
+    public Light(Mediator mediator) {
+        super(mediator);
+    }
+
+    @Override
+    public void sendEvent(String event) {
+        System.out.println("Light sends event: " + event);
+        mediator.notify(this, event);
+    }
+
+    @Override
+    public void receiveEvent(String event) {
+        System.out.println("Light receives event: " + event);
+    }
+}
+public class HouseMediator implements Mediator {
+    @Override
+    public void notify(Device sender, String event) {
+        
+        System.out.println("Mediator receives event from " + sender.getClass().getSimpleName() + ": " + event);
+    }
+}
+public class SmartHouseSystem {
+    public static void main(String[] args) {
+        Mediator mediator = new HouseMediator();
+
+        Device doorLock = new DoorLock(mediator);
+        Device motionSensor = new MotionSensor(mediator);
+        Device light = new Light(mediator);
+
+        doorLock.sendEvent("Unlock");
+        motionSensor.sendEvent("Motion Detected");
+        light.sendEvent("Turn On");
+    }
+}
