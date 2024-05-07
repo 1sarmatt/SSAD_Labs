@@ -1,0 +1,121 @@
+Task 1
+
+#include <iostream>
+#include <string>
+#include <memory> // For unique_ptr
+
+using namespace std;
+
+// Part 1: Singleton Design Pattern - Logger
+
+class Logger {
+private:
+    Logger() {} // Private constructor to prevent direct instantiation
+    static unique_ptr<Logger> instance; // Unique pointer to hold the single instance
+
+public:
+    static Logger& getInstance() {
+        if (!instance) {
+            instance = make_unique<Logger>();
+        }
+        return *instance;
+    }
+
+    void log(const string& message) {
+        cout << "[Log] " << message << endl; 
+        // Here, you could also log to a file or perform other logging actions
+    }
+};
+
+unique_ptr<Logger> Logger::instance = nullptr; // Initialize the static member
+
+// Part 2: State Design Pattern - Document State Management
+
+class DocumentState {
+public:
+    virtual void handleInput(const string& input) = 0;
+};
+
+class DraftState : public DocumentState {
+public:
+    void handleInput(const string& input) override {
+        cout << "In Draft state: Editing document content - " << input << endl;
+    }
+};
+
+class ReviewState : public DocumentState {
+public:
+    void handleInput(const string& input) override {
+        cout << "In Review state: Providing feedback - " << input << endl;
+    }
+};
+
+class FinalState : public DocumentState {
+public:
+    void handleInput(const string& input) override {
+        cout << "In Final state: Document is locked. No further edits allowed." << endl;
+    }
+};
+
+class Document {
+private:
+    DocumentState* currentState;
+
+public:
+    Document(DocumentState* initialState) : currentState(initialState) {}
+
+    void handleInput(const string& input) {
+        currentState->handleInput(input);
+    }
+
+    void changeState(DocumentState* newState) {
+        currentState = newState;
+        Logger::getInstance().log("Document state changed"); 
+    }
+};
+
+// Part 3: Prototype Design Pattern - Document Creation
+
+class DocumentPrototype {
+public:
+    virtual unique_ptr<DocumentPrototype> clone() const = 0;
+};
+
+class ReportType : public DocumentPrototype {
+public:
+    unique_ptr<DocumentPrototype> clone() const override {
+        return make_unique<ReportType>(*this); // Create a copy of itself
+    }
+};
+
+class InvoiceType : public DocumentPrototype {
+public:
+    unique_ptr<DocumentPrototype> clone() const override {
+        return make_unique<InvoiceType>(*this);
+    }
+};
+
+int main() {
+    // Create prototypes
+    ReportType reportPrototype;
+    InvoiceType invoicePrototype;
+
+  
+    unique_ptr<DocumentPrototype> doc1 = reportPrototype.clone();
+    unique_ptr<DocumentPrototype> doc2 = invoicePrototype.clone();
+
+    Logger::getInstance().log("Cloned a report document");
+    Logger::getInstance().log("Cloned an invoice document");
+
+
+    Document document(new DraftState()); // Start in Draft state
+    document.handleInput("Adding initial content...");
+
+    document.changeState(new ReviewState());
+    document.handleInput("Looks good so far...");
+
+    document.changeState(new FinalState());
+    document.handleInput("Trying to edit..."); // Won't allow edits
+
+    return 0;
+}
