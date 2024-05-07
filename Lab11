@@ -59,3 +59,96 @@ public class MusicStreamingApp {
         rockPlayer.play("rock_song.flac");
     }
 }
+
+Task 2
+
+import java.awt.*;
+
+public class ShapeType implements IShape {
+    private Color color;
+    private Color fillColor;
+    private double thickness;
+
+    public ShapeType(Color color, Color fillColor, double thickness) {
+        this.color = color;
+        this.fillColor = fillColor;
+        this.thickness = thickness;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public Color getFillColor() {
+        return fillColor;
+    }
+
+    public double getThickness() {
+        return thickness;
+    }
+
+    @Override
+    public void draw(double x, double y) {
+        // Draw logic here
+    }
+}
+
+public class ShapeFactory {
+    private static final Map<String, ShapeType> shapeMap = new HashMap<>();
+
+    public static ShapeType getShapeType(Color color, Color fillColor, double thickness) {
+        String key = color.toString() + fillColor.toString() + thickness;
+        
+        // Check if the shape type already exists in the map
+        if (!shapeMap.containsKey(key)) {
+            shapeMap.put(key, new ShapeType(color, fillColor, thickness));
+        }
+
+        return shapeMap.get(key);
+    }
+}
+
+
+public class Circle implements IShape {
+    private double x;
+    private double y;
+    private ShapeType shapeType;
+    private double radius;
+
+    public Circle(double x, double y, ShapeType shapeType, double radius) {
+        this.x = x;
+        this.y = y;
+        this.shapeType = shapeType;
+        this.radius = radius;
+    }
+
+    
+}
+
+public class Line implements IShape {
+    private double x;
+    private double y;
+    private ShapeType shapeType;
+    private double length;
+
+    public Line(double x, double y, ShapeType shapeType, double length) {
+        this.x = x;
+        this.y = y;
+        this.shapeType = shapeType;
+        this.length = length;
+    }
+
+    // Other methods remain the same
+}
+
+public class Painting {
+    public static void main(String[] args) {
+        ShapeType sharedProperties = ShapeFactory.getShapeType(Color.LIGHT_GRAY, Color.GRAY, 5);
+        
+        IShape line = new Line(2.2, 3.0, sharedProperties, 10);
+        IShape circle = new Circle(2.2, 3.0, sharedProperties, 10);
+        
+        
+    }
+}
+
