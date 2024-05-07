@@ -1,1 +1,126 @@
 Task 1
+
+#include <iostream>
+#include <cstring> 
+
+using namespace std;
+
+
+template <typename T>
+class Wrapper {
+private:
+    T value;
+
+public:
+    Wrapper(const T& val) : value(val) {}
+
+    T getValue() const {
+        return value;
+    }
+};
+
+
+template <>
+class Wrapper<char*> {
+private:
+    char* value;
+
+public:
+    Wrapper(char* val) : value(val) {}
+
+
+    size_t getValue() const {
+        return strlen(value);
+    }
+};
+
+int main() {
+    Wrapper<int> intWrapper(42);
+    cout << "Integer value: " << intWrapper.getValue() << endl;
+
+    Wrapper<char*> stringWrapper("Hello, world!");
+    cout << "String length: " << stringWrapper.getValue() << endl;
+
+    return 0;
+}
+
+
+Task 2
+
+#include <iostream>
+#include <vector>
+#include <utility> // For pair
+#include <algorithm> // For find_if
+
+using namespace std;
+
+template <typename K, typename V>
+class Dictionary {
+private:
+    vector<pair<K, V>> data;
+
+public:
+   
+    V get(const K& key) const {
+        auto it = find_if(data.begin(), data.end(), 
+                         [&key](const auto& p) { return p.first == key; });
+        if (it != data.end()) {
+            return it->second;
+        } else {
+            throw runtime_error("Key not found"); 
+        }
+    }
+
+  
+    void put(const K& key, const V& value) {
+        auto it = find_if(data.begin(), data.end(), 
+                         [&key](const auto& p) { return p.first == key; });
+        if (it != data.end()) {
+            it->second = value; // Update existing value
+        } else {
+            data.push_back(make_pair(key, value)); // Insert new pair
+        }
+    }
+
+
+    void remove(const K& key) {
+        auto it = find_if(data.begin(), data.end(), 
+                         [&key](const auto& p) { return p.first == key; });
+        if (it != data.end()) {
+            data.erase(it);
+        } else {
+            
+        }
+    }
+
+    size_t size() const {
+        return data.size();
+    }
+};
+
+int main() {
+    Dictionary<string, int> ages;
+
+    ages.put("Alice", 30);
+    ages.put("Bob", 25);
+    ages.put("Charlie", 35);
+
+    cout << "Size: " << ages.size() << endl; 
+
+    cout << "Alice's age: " << ages.get("Alice") << endl; 
+
+    ages.put("Bob", 26); // Update Bob's age
+    cout << "Bob's age: " << ages.get("Bob") << endl; 
+
+    ages.remove("Charlie");
+    cout << "Size after removal: " << ages.size() << endl;
+
+    try {
+        cout << ages.get("Charlie") << endl; 
+    } catch (const runtime_error& e) {
+        cerr << "Error: " << e.what() << endl; 
+    }
+
+    return 0;
+}
+
