@@ -156,3 +156,69 @@ int main() {
     delete text; // Remember to release memory
     return 0;
 }
+
+Task 3
+
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+
+class Document {
+public:
+    virtual void display() const = 0;
+};
+
+
+class RealDocument : public Document {
+private:
+    string content;
+
+public:
+    RealDocument(const string& content) : content(content) {}
+
+    void display() const override {
+        cout << "Real Document Content: " << content << endl;
+    }
+};
+
+
+class SecureDocumentProxy : public Document {
+private:
+    RealDocument* realDocument; 
+    string role;
+
+public:
+    SecureDocumentProxy(const string& content, const string& role) : role(role) {
+        realDocument = new RealDocument(content); // Create the RealDocument
+    }
+
+    ~SecureDocumentProxy() {
+        delete realDocument; // Ensure RealDocument is deleted
+    }
+
+    void display() const override {
+        if (role == "ADMIN") {
+            realDocument->display(); // Grant access for ADMIN users
+        } else {
+            cout << "Access Denied: You need admin privileges to view this document." << endl;
+        }
+    }
+};
+
+int main() {
+
+    SecureDocumentProxy document1("Top Secret Report", "ADMIN");
+    SecureDocumentProxy document2("Confidential Data", "USER");
+
+    // Access documents
+    cout << "Admin Access:" << endl;
+    document1.display(); // Access granted
+
+    cout << "\nUser Access:" << endl;
+    document2.display(); // Access denied
+
+    return 0;
+}
+
