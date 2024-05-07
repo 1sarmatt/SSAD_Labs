@@ -1,0 +1,104 @@
+Task 1
+
+
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+template <typename T>
+class CircularBuffer {
+private:
+    vector<T> data;
+    size_t head; // Index of the front element
+    size_t tail; // Index of the next available slot (one past the last element)
+    size_t capacity;
+
+public:
+    CircularBuffer(size_t size) : data(size), head(0), tail(0), capacity(size) {}
+
+    bool empty() const { return head == tail; }
+    size_t size() const { return (tail + capacity - head) % capacity; }
+
+    void push(const T& value) {
+        data[tail] = value;
+        tail = (tail + 1) % capacity;
+        if (tail == head) { // Buffer is full, overwrite the oldest element
+            head = (head + 1) % capacity;
+        }
+    }
+
+    T pop() {
+        if (empty()) {
+            throw runtime_error("Circular buffer is empty");
+        }
+        T value = data[head];
+        head = (head + 1) % capacity;
+        return value;
+    }
+
+
+    class iterator {
+    private:
+        CircularBuffer& buffer;
+        size_t index;
+
+    public:
+        iterator(CircularBuffer& buf, size_t idx) : buffer(buf), index(idx) {}
+
+        T& operator*() const { return buffer.data[index]; }
+        T* operator->() const { return &buffer.data[index]; }
+
+        iterator& operator++() { // Prefix increment
+            index = (index + 1) % buffer.capacity;
+            return *this;
+        }
+
+        iterator operator++(int) { 
+            iterator temp = *this;
+            ++(*this);
+            return temp;
+        }
+
+        bool operator==(const iterator& other) const {
+            return &buffer == &other.buffer && index == other.index;
+        }
+
+        bool operator!=(const iterator& other) const {
+            return !(*this == other);
+        }
+    };
+
+    iterator begin() { return iterator(*this, head); }
+    iterator end() { return iterator(*this, tail); } 
+};
+
+int main() {
+    CircularBuffer<int> buffer(5);
+
+    buffer.push(10);
+    buffer.push(20);
+    buffer.push(30);
+    buffer.push(40);
+    buffer.push(50); // Buffer is now full
+
+    cout << "Size: " << buffer.size() << endl; 
+
+    buffer.push(60); 
+
+  
+    for (int x : buffer) {
+        cout << x << " ";
+    }
+    cout << endl; 
+
+ 
+    while (!buffer.empty()) {
+        cout << buffer.pop() << " ";
+    }
+    cout << endl; 
+
+    return 0;
+}
+
+
