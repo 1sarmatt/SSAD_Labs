@@ -1,2 +1,61 @@
 Task 1
 
+
+interface MusicPlayer {
+    void play(String fileName);
+}
+
+
+abstract class GenreMusicPlayer implements MusicPlayer {
+    protected Codec codec;
+
+    public GenreMusicPlayer(Codec codec) {
+        this.codec = codec;
+    }
+
+    public abstract void play(String fileName);
+}
+
+class PopMusicPlayer extends GenreMusicPlayer {
+    public PopMusicPlayer(Codec codec) {
+        super(codec);
+    }
+
+    @Override
+    public void play(String fileName) {
+        System.out.println("Playing Pop music...");
+        codec.decode(fileName);
+    }
+}
+
+
+interface Codec {
+    void decode(String fileName);
+}
+
+
+class MP3Codec implements Codec {
+    @Override
+    public void decode(String fileName) {
+        System.out.println("Decoding MP3 file: " + fileName);
+    }
+}
+
+
+
+
+public class MusicStreamingApp {
+    public static void main(String[] args) {
+        Codec mp3Codec = new MP3Codec();
+        Codec wavCodec = new WAVCodec();
+        Codec flacCodec = new FLACCodec();
+
+        MusicPlayer popPlayer1 = new PopMusicPlayer(mp3Codec);
+        MusicPlayer jazzPlayer = new JazzMusicPlayer(wavCodec);
+        MusicPlayer rockPlayer = new RockMusicPlayer(flacCodec);
+
+        popPlayer1.play("pop_song.mp3");
+        jazzPlayer.play("jazz_song.wav");
+        rockPlayer.play("rock_song.flac");
+    }
+}
