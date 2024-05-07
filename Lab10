@@ -1,0 +1,158 @@
+Task 1
+
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+
+class Light {
+public:
+    void on() {
+        cout << "Turning on the lights." << endl;
+    }
+
+    void off() {
+        cout << "Turning off the lights." << endl;
+    }
+};
+
+class Thermostat {
+public:
+    void setTemperature(double temperature) {
+        cout << "Setting thermostat to " << temperature << " degrees." << endl;
+    }
+};
+
+class SecurityCamera {
+public:
+    void activate() {
+        cout << "Activating security cameras." << endl;
+    }
+
+    void deactivate() {
+        cout << "Deactivating security cameras." << endl;
+    }
+};
+
+
+class SmartHomeFacade {
+private:
+    Light light;
+    Thermostat thermostat;
+    SecurityCamera camera;
+
+public:
+    void leavingHome() {
+        cout << "Leaving Home:" << endl;
+        light.off();
+        thermostat.setTemperature(18); // Eco mode temperature
+        camera.activate();
+    }
+
+    void arrivingHome() {
+        cout << "Arriving Home:" << endl;
+        light.on();
+        thermostat.setTemperature(22); // Comfortable temperature
+        camera.deactivate();
+    }
+};
+
+int main() {
+    SmartHomeFacade smartHome;
+
+    smartHome.leavingHome();
+    cout << endl;
+
+    smartHome.arrivingHome();
+
+    return 0;
+}
+
+
+Task 2
+
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+
+class Text {
+public:
+    virtual void write() const = 0;
+};
+
+
+class PlainText : public Text {
+private:
+    string text;
+
+public:
+    PlainText(const string& text) : text(text) {}
+
+    void write() const override {
+        cout << text;
+    }
+};
+
+
+class TextDecorator : public Text {
+protected:
+    Text* decoratedText;
+
+public:
+    TextDecorator(Text* text) : decoratedText(text) {}
+
+    virtual void write() const override {
+        decoratedText->write();
+    }
+};
+
+
+class Bold : public TextDecorator {
+public:
+    Bold(Text* text) : TextDecorator(text) {}
+
+    void write() const override {
+        cout << "\033[1m";
+        decoratedText->write();
+        cout << "\033[0m";
+    }
+};
+
+class Italic : public TextDecorator {
+public:
+    Italic(Text* text) : TextDecorator(text) {}
+
+    void write() const override {
+        cout << "\033[3m";
+        decoratedText->write();
+        cout << "\033[0m";
+    }
+};
+
+class Underline : public TextDecorator {
+public:
+    Underline(Text* text) : TextDecorator(text) {}
+
+    void write() const override {
+        cout << "\033[4m";
+        decoratedText->write();
+        cout << "\033[0m";
+    }
+};
+
+int main() {
+    Text* text = new PlainText("Hello, World!"); 
+
+    // Apply decorators
+    text = new Bold(text);
+    text = new Italic(text);
+    text = new Underline(text);
+
+    text->write(); // Outputs: Hello, World! (in bold, italic, and underline)
+
+    delete text; // Remember to release memory
+    return 0;
+}
